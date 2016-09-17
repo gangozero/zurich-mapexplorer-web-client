@@ -58,7 +58,7 @@ function getUserSquares(map)
             lastLon = sqObj.lon;
         });     
 
-        map.setView([lastLat, lastLon], 15)
+        map.setView([lastLat, lastLon], 15);
     });  
 }
 
@@ -73,7 +73,7 @@ $(document).ready(function(){
 	maxZoom: 19
 }).addTo(mymap);
    
-   getUserSquares();
+   getUserSquares(mymap);
     
 });
 
