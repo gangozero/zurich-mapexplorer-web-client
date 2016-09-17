@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>MapExplorer Profile View</title>
+        <title>MapExplorer Friends View</title>
         
         <link rel="stylesheet" href="main.css">
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.css" />
@@ -14,12 +14,16 @@
 
         <table border="0" width="1000" align="center">
                 <tbody><tr>
-                    <td colspan="2"><h1>MapExplorer : Commander Spok's Profile</h1></td>
+                    <td colspan="2"><h1>MapExplorer : Commander Spok's Friends View</h1></td>
                 </tr>
                 <tr>
                     <td width="200" valign="top" align="center">
                         <img id="userphoto" src="userphoto.jpg" border="0">
                         <div id="userXP">XP: -</div>
+                        <div style="text-align:left; margin-top:30px;">
+                            <ul id="frList">
+                            <ul>    
+                        </div>
                     </td>
                     <td>
                         <div id="mapid"></div>
@@ -30,11 +34,8 @@
        
     
     <script>
-function addSquare(map,lat,lon,heat)
+function addSquare(map,lat,lon,rcolor)
 {
-  var rcolor = '#E6160B';
-  if(heat <= 10) rcolor = '#E8D500';
-  if(heat <= 2) rcolor = '#08E800';
 
   var polygon = L.polygon([
             [lat,lon],
@@ -46,19 +47,25 @@ function addSquare(map,lat,lon,heat)
 
 
  
-function getUserSquares(map)
+function getFriendsSquares(map)
 {
-  $.getJSON('https://dbvmcgu4i2.execute-api.eu-west-1.amazonaws.com/prod/map?user_id=user1&token=123&heat=true&id=user1', function(data){
-        lastLat = 47.389855;
-        lastLon = 8.517995;
-        $.each(data,function(key,sqObj)
+  $.getJSON('https://dbvmcgu4i2.execute-api.eu-west-1.amazonaws.com/prod/user/friends?id=user1&token=123&self=true', function(data){
+        $.each(data,function(key,userObj)
         {
-            addSquare(map,sqObj.lat, sqObj.lon, sqObj.heat);
-            lastLat = sqObj.lat;
-            lastLon = sqObj.lon;
-        });     
+            $('#frList').append('<li style="color:'+userObj.color+'">'+userObj.name+'</li>');
+            $.getJSON('https://dbvmcgu4i2.execute-api.eu-west-1.amazonaws.com/prod/map?user_id='+userObj.id+'&token=123&id=user1', function(data){
+                lastLat = 47.389855;
+                lastLon = 8.517995;
+                $.each(data,function(key,sqObj)
+                {
+                    addSquare(map,sqObj.lat, sqObj.lon, userObj.color);
+                    lastLat = sqObj.lat;
+                    lastLon = sqObj.lon;
+                });     
 
-        map.setView([lastLat, lastLon], 15);
+                map.setView([lastLat, lastLon], 15);
+            }); 
+        });     
     });  
 }
 
@@ -82,9 +89,8 @@ $(document).ready(function(){
 	subdomains: 'abcd',
 	maxZoom: 19
 }).addTo(mymap);
-   
    updateXP();
-   getUserSquares(mymap);
+   getFriendsSquares(mymap);
     
 });
 
