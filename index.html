@@ -14,12 +14,13 @@
 
         <table border="0" width="1000" align="center">
                 <tbody><tr>
-                    <td colspan="2"><h1>MapExplorer : Commander Spok's Profile</h1></td>
+                    <td colspan="2"><h1 id="title">MapExplorer : ...</h1></td>
                 </tr>
                 <tr>
                     <td width="200" valign="top" align="center">
                         <img id="userphoto" src="userphoto.jpg" border="0">
                         <div id="userXP">XP: -</div>
+                        <div style="margin-top:30px"><a href="friends.html">Friends</a></div>
                     </td>
                     <td>
                         <div id="mapid"></div>
@@ -48,7 +49,7 @@ function addSquare(map,lat,lon,heat)
  
 function getUserSquares(map)
 {
-  $.getJSON('https://dbvmcgu4i2.execute-api.eu-west-1.amazonaws.com/prod/map?user_id=user1&token=123&heat=true&id=user1', function(data){
+  $.getJSON('https://dbvmcgu4i2.execute-api.eu-west-1.amazonaws.com/prod/map?user_id='+getUserId()+'&token=123&heat=true&id=user1', function(data){
         lastLat = 47.389855;
         lastLon = 8.517995;
         $.each(data,function(key,sqObj)
@@ -64,12 +65,40 @@ function getUserSquares(map)
 
 function updateXP()
 {
-    $.getJSON('https://dbvmcgu4i2.execute-api.eu-west-1.amazonaws.com/prod/user/friends?id=user1&token=123&self=true', function(data){
+    $.getJSON('https://dbvmcgu4i2.execute-api.eu-west-1.amazonaws.com/prod/user/friends?id='+getUserId()+'&token=123&self=true', function(data){
         $.each(data,function(key,userObj)
         {
-          if(userObj.id == 'user1') $('#userXP').text('XP: '+userObj.xp); 
+          if(userObj.id == getUserId()) 
+          {
+              $('#userXP').text('XP: '+userObj.xp);
+              $('#title').text('MapExplorer : '+userObj.name+'\'s Profile'); 
+          }
         });     
     });  
+}
+
+var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }
+    }
+};
+
+
+
+function getUserId()
+{
+    var userid = getUrlParameter('u');
+    if(userid === undefined) return 'user1';
+    return userid;
 }
 
 

@@ -4,6 +4,10 @@ body{
     font-family: sans-serif;
 }
 
+a{
+    color:white;
+}
+
 #userphoto{
     width:100px;
     height:100px;
